@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{post.title}}{% endblock title %}
+{% block content %}
+
+<div class="container py-5 px-2 bg-white">
+    <div class="row px-4">
+        <div class="col-12">
+            {% if post.image %}
+            <img class="img-fluid mb-4" src="{{post.image.url}}" alt="Image">
+
+            {% endif %}
+            <h2 class="mb-3 font-weight-bold">{{post.title}}</h2>
+            <div class="d-flex">
+                <p class="mr-3 text-muted"><i class="fa fa-calendar-alt"></i> {{post.created | date:"d-b-Y"}}</p>
+                <p class="mr-3 text-muted"><i class="fa fa-folder"></i> Web Design</p>
+                {% if post.comments.count <= 1 %} <p class="mr-3 text-muted"><i class="fa fa-comments"></i>
+                    {{post.comments.count}} Comment</p>
+                    {% else %}
+                    <p class="mr-3 text-muted"><i class="fa fa-comments"></i> {{post.comments.count}} Comments</p>
+
+                    {% endif %}
+            </div>
+            <p>{{post.body}}</p>
+            
+        </div>
+        <div class="col-12 py-4">
+            {% for tag in tags %}
+            <a href="{% url "post_filter" tag.name %}" class="btn btn-sm btn-outline-primary mb-1">{{tag.name}}</a>
+            
+            {% endfor %}
+        </div>
+        <div class="col-12 py-4">
+            <div class="btn-group btn-group-lg w-100">
+                <button type="button" class="btn btn-outline-primary"><i class="fa fa-angle-left mr-2"></i>
+                    Previous</button>
+                <button type="button" class="btn btn-outline-primary">Next<i
+                        class="fa fa-angle-right ml-2"></i></button>
+            </div>
+        </div>
+        <div class="col-12 py-4">
+            {% if post.comments.count <= 1 %} <h3 class="mb-4 font-weight-bold">{{post.comments.count}} Comment</h3>
+                {% else %}
+                <h3 class="mb-4 font-weight-bold">{{post.comments.count}} Comments</h3>
+
+                {% endif %}
+                {% for comment in comments %}
+
+                <div class="media mb-4">
+                    <img src="{{comment.image.url}}" alt="Image" class="mr-3 mt-1 rounded-circle" style="width:60px;">
+                    <div class="media-body">
+                        {% if comment.isParent %}
+                        <h4>{{comment.name}} <small><i>{{comment.created}}</i></small></h4>
+                        <p>{{comment.message}}</p>
+                        {% endif %}
+                        {% if comment.getReplies %}
+                        {% for reply in comment.getReplies %}
+                        
+                        <div class="media mb-4">
+                            <img src="{{reply.image.url}}" alt="image" class="mr-3 mt-1 rounded-circle" style="width: 60px;">
+                            <div class="media-body">
+                                <h4>{{reply.name}} <small><i>{{reply.created}}</i></small></h4>
+                                <p>{{reply.message}}</p>
+                            </div>
+                        </div>
+
+                        {% endfor %}
+
+                        {% endif %}
+
+                        <div class="col-12">
+                            <h3 class=" mb-4 font-weight-bold"> Reply a comment</h3>
+                            <form method="post">
+                                {% csrf_token %}
+                                {{comment_form.as_p}}
+                                <input type="hidden" name="parentId" value="{{comment.pk}}">
+                                <div class="form-group">
+                                    <input type="submit" value="Reply Comment" class="btn btn-primary">
+                                </div>
+                            </form>
+                        </div>
+
+
+                        {% comment %} <button class="btn btn-sm btn-light">Reply</button> {% endcomment %}
+                    </div>
+                </div>
+
+                {% endfor %}
+
+                {% comment %} <div class="media mb-4">
+                    <img src="img/user.jpg" alt="Image" class="mr-3 mt-1 rounded-circle" style="width:60px;">
+                    <div class="media-body">
+                        <h4>John Doe <small><i>01 Jan 2045 at 12:00pm</i></small></h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua.
+                        </p>
+                        <button class="btn btn-sm btn-light">Reply</button>
+                        <div class="media mt-4">
+                            <img src="img/user.jpg" alt="Image" class="mr-3 mt-1 rounded-circle" style="width:60px;">
+                            <div class="media-body">
+                                <h4>John Doe <small><i>01 Jan 2045 at 12:00pm</i></small></h4>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                    incididunt ut labore et dolore magna aliqua.
+                                </p>
+                                <button class="btn btn-sm btn-light">Reply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+        </div>
+        <div class="col-12">
+            <h3 class="mb-4 font-weight-bold">Leave a comment</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{comment_form.as_p}}
+                {% comment %} <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" class="form-control" id="name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" class="form-control" id="email">
+                </div>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="url" class="form-control" id="website">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                </div> {% endcomment %}
+                <div class="form-group">
+                    <input type="submit" value="Leave Comment" class="btn btn-primary">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
